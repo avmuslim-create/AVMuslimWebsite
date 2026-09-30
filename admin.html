@@ -1,0 +1,132 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>School Admin Panel</title><style>*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f3faf5;color:#173b28}.login{min-height:100vh;display:grid;place-items:center;padding:20px}.login-box,.panel{background:#fff;border:1px solid #d9f1df;border-radius:18px;box-shadow:0 15px 45px #164e3a12}.login-box{width:min(420px,100%);padding:32px}.wrap{max-width:1400px;margin:auto;padding:20px}.top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px}.top h1{margin:0;color:#14532d}.layout{display:grid;grid-template-columns:230px 1fr;gap:18px}.side{padding:14px}.side button{display:block;width:100%;text-align:left;border:0;background:transparent;padding:12px;border-radius:9px;cursor:pointer;font-weight:700;color:#365b45}.side button.active,.side button:hover{background:#dcfce7;color:#166534}.content{padding:22px}.tab{display:none}.tab.active{display:block}.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.stat{padding:20px;border-radius:14px;background:#eefaf1;border:1px solid #d9f1df}.stat b{display:block;font-size:28px;color:#15803d}.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}.btn{border:0;border-radius:9px;padding:10px 14px;background:#15803d;color:#fff;cursor:pointer;font-weight:700}.btn.alt{background:#e7f6eb;color:#166534}.btn.danger{background:#b91c1c}.btn.small{padding:7px 9px;font-size:12px}input,select,textarea{width:100%;padding:10px;border:1px solid #cbded0;border-radius:8px;margin:5px 0 12px}label{font-size:13px;font-weight:700}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}.tablewrap{overflow:auto}.table{width:100%;border-collapse:collapse}.table th,.table td{border-bottom:1px solid #e4eee7;padding:9px;text-align:left;font-size:13px}.table th{background:#f1faf3}.modal{position:fixed;inset:0;background:#0007;display:none;align-items:center;justify-content:center;padding:20px;z-index:10}.modal.show{display:flex}.modalbox{background:#fff;border-radius:16px;padding:24px;width:min(700px,100%);max-height:90vh;overflow:auto}.notice{padding:12px;background:#fff8df;border:1px solid #f4e3a1;border-radius:9px;margin:10px 0}.hidden{display:none}@media(max-width:850px){.layout{grid-template-columns:1fr}.cards{grid-template-columns:1fr 1fr}.grid2{grid-template-columns:1fr}}@media(max-width:500px){.cards{grid-template-columns:1fr}}@media print{.no-print{display:none!important}.wrap{padding:0}.table th,.table td{font-size:11px}}</style></head><body><div id="login" class="login"><div class="login-box"><h1>School Admin</h1><p>Manage students, teachers, classes and results.</p><form onsubmit="login(event)"><label>Username</label><input id="username" value="admin" required><label>Password</label><input id="password" type="password" required><button class="btn" style="width:100%">Login</button></form><div id="loginMsg"></div><p style="font-size:12px;color:#64748b">Initial password: <b>ChangeMe123!</b> — change it in the database before public deployment.</p></div></div><div id="app" class="wrap hidden"><div class="top"><div><h1>School Administration</h1><span id="adminName"></span></div><div class="toolbar"><a class="btn alt" href="./index.html">View Website</a><button class="btn" onclick="logout()">Logout</button></div></div><div class="layout"><aside class="side panel"><button class="active" onclick="tab('dashboard',this)">📊 Dashboard</button><button onclick="tab('students',this)">👩‍🎓 Students</button><button onclick="tab('teachers',this)">👩‍🏫 Teachers</button><button onclick="tab('classes',this)">🏫 Classes & Sections</button><button onclick="tab('exams',this)">📝 Examinations</button><button onclick="tab('admissions',this);loadAdmissions()">📥 Admissions</button><button onclick="tab('marks',this)">✍️ Enter Marks</button><button onclick="tab('reports',this)">🖨 Reports</button></aside><main class="content panel"><section id="dashboard" class="tab active"><h2>Dashboard</h2><div class="cards" id="stats"></div><div class="notice">Use the left menu to update school records. Changes are saved directly to MySQL.</div></section><section id="students" class="tab"><div class="top"><h2>Students</h2><button class="btn" onclick="studentForm()">+ Add Student</button></div><input placeholder="Search students..." oninput="filterTable(this,'studentsTable')"><div class="tablewrap"><table class="table" id="studentsTable"></table></div></section><section id="teachers" class="tab"><div class="top"><h2>Teachers & Staff</h2><button class="btn" onclick="teacherForm()">+ Add Teacher</button></div><div class="tablewrap"><table class="table" id="teachersTable"></table></div></section><section id="classes" class="tab"><h2>Classes & Sections</h2><div class="grid2"><div><div class="toolbar"><button class="btn" onclick="classForm()">+ Add Class</button></div><table class="table" id="classesTable"></table></div><div><div class="toolbar"><button class="btn" onclick="sectionForm()">+ Add Section</button></div><table class="table" id="sectionsTable"></table></div></div></section><section id="exams" class="tab"><div class="top"><h2>Examinations</h2><button class="btn" onclick="examForm()">+ Add Examination</button></div><table class="table" id="examsTable"></table></section><section id="admissions" class="tab">
+<div class="top">
+  <div>
+    <h2>Online Admissions</h2>
+    <p style="margin:0;color:#64748b">Applications submitted from the public website.</p>
+  </div>
+  <button class="btn alt" onclick="loadAdmissions()">↻ Refresh</button>
+</div>
+<input placeholder="Search applications..." oninput="filterTable(this,'admissionsTable')">
+<div class="tablewrap">
+<table class="table" id="admissionsTable"></table>
+</div>
+</section><section id="marks" class="tab"><h2>Enter / Update Marks</h2><form onsubmit="saveMarks(event)"><div class="grid2"><div><label>Examination</label><select id="markExam" required></select></div><div><label>Student</label><select id="markStudent" required></select></div></div><p style="font-size:13px;color:#64748b">Add one row per subject. Total and percentage are calculated automatically.</p><div id="subjectRows"></div><button type="button" class="btn alt" onclick="addSubjectRow()">+ Add Subject</button><button class="btn" style="margin-left:8px">Save Result</button></form></section><section id="reports" class="tab"><h2>Reports & Printing</h2><div class="grid2"><div class="stat"><b>Individual</b><p>Open any student result and print the complete subject-wise result.</p></div><div class="stat"><b>Class Result</b><p>From the website's class/section student list, print roll number, student name and total marks only.</p></div><div class="stat"><b>Whole School</b><p>Print the complete school list with total marks, obtained marks and percentage only.</p><button class="btn" onclick="printWholeSchoolResult()">🖨 Print Whole School Result</button></div></div></section></main></div></div><div id="modal" class="modal"><div class="modalbox"><div class="top"><h2 id="modalTitle">Edit</h2><button class="btn alt" onclick="closeModal()">×</button></div><div id="modalBody"></div></div></div><script>
+let S={students:[],teachers:[],classes:[],sections:[],exams:[],admissions:[]};
+async function api(a,opt={}){
+  const r=await fetch('./api.php?action='+encodeURIComponent(a),{
+    credentials:'same-origin',
+    ...opt,
+    headers:{'Content-Type':'application/json',...(opt.headers||{})}
+  });
+  const d=await r.json().catch(()=>({success:false,message:'Invalid server response.'}));
+  if(!r.ok||d.success===false)throw Error(d.message||'Request failed');
+  return d;
+}
+async function login(e){
+  e.preventDefault();
+  const usernameEl=document.getElementById('username');
+  const passwordEl=document.getElementById('password');
+  const loginMsgEl=document.getElementById('loginMsg');
+
+  try{
+    const d=await api('login',{
+      method:'POST',
+      body:JSON.stringify({
+        username:usernameEl.value.trim(),
+        password:passwordEl.value
+      })
+    });
+    await showApp(d.admin.name);
+  }catch(x){
+    loginMsgEl.innerHTML='<div class="notice">'+esc(x.message)+'</div>';
+  }
+}
+async function boot(){const s=await api('session');if(s.logged_in)showApp(s.admin.name)}
+async function showApp(name){login.classList.add('hidden');app.classList.remove('hidden');adminName.textContent='Logged in as '+name;await refresh();}
+async function logout(){await api('logout');location.reload()}
+function tab(id,b){document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.side button').forEach(x=>x.classList.remove('active'));b.classList.add('active');}
+async function refresh(){const [d,st,t,c,e]=await Promise.all([api('dashboard'),api('admin_students'),api('admin_teachers'),api('admin_classes'),api('admin_exams')]);stats.innerHTML=`<div class="stat"><b>${d.students}</b>Students</div><div class="stat"><b>${d.teachers}</b>Teachers/Staff</div><div class="stat"><b>${d.classes}</b>Classes</div><div class="stat"><b>${d.sections}</b>Sections</div>`;S.students=st.rows;S.teachers=t.rows;S.classes=c.classes;S.sections=c.sections;S.exams=e.rows;renderTables();fillMarkSelects()}
+function renderTables(){studentsTable.innerHTML='<tr><th>Roll</th><th>Name</th><th>Class</th><th>Section</th><th>Father</th><th>Action</th></tr>'+S.students.map(x=>`<tr><td>${esc(x.roll||'-')}</td><td>${esc(x.name)}</td><td>${esc(x.class_name||'-')}</td><td>${esc(x.section_name||'-')}</td><td>${esc(x.father||'-')}</td><td><button class="btn small" onclick='studentForm(${JSON.stringify(x)})'>Edit</button> <button class="btn small danger" onclick="delStudent(${x.id})">Delete</button></td></tr>`).join('');teachersTable.innerHTML='<tr><th>Name</th><th>Designation</th><th>Qualification</th><th>Phone</th><th>Action</th></tr>'+S.teachers.map(x=>`<tr><td>${esc(x.name)}</td><td>${esc(x.designation||'-')}</td><td>${esc(x.qualification||'-')}</td><td>${esc(x.phone||'-')}</td><td><button class="btn small" onclick='teacherForm(${JSON.stringify(x)})'>Edit</button> <button class="btn small danger" onclick="delTeacher(${x.id})">Delete</button></td></tr>`).join('');classesTable.innerHTML='<tr><th>Class</th><th>Action</th></tr>'+S.classes.map(x=>`<tr><td>${esc(x.name)}</td><td><button class="btn small" onclick='classForm(${JSON.stringify(x)})'>Edit</button></td></tr>`).join('');sectionsTable.innerHTML='<tr><th>Section</th><th>Class</th><th>Action</th></tr>'+S.sections.map(x=>`<tr><td>${esc(x.name)}</td><td>${esc(x.class_name||'-')}</td><td><button class="btn small" onclick='sectionForm(${JSON.stringify(x)})'>Edit</button></td></tr>`).join('');examsTable.innerHTML='<tr><th>Name</th><th>Year</th><th>Published</th><th>Demo</th><th>Action</th></tr>'+S.exams.map(x=>`<tr><td>${esc(x.name)}</td><td>${esc(x.academic_year)}</td><td>${x.is_published?'Yes':'No'}</td><td>${x.is_demo?'Yes':'No'}</td><td><button class="btn small" onclick='examForm(${JSON.stringify(x)})'>Edit</button></td></tr>`).join('')}
+function esc(x){return String(x??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function filterTable(input,id){const q=input.value.toLowerCase();document.querySelectorAll('#'+id+' tr').forEach((r,i)=>{if(i===0)return;r.style.display=r.innerText.toLowerCase().includes(q)?'':'none'})}
+function openModal(title,body){modalTitle.textContent=title;modalBody.innerHTML=body;modal.classList.add('show')};function closeModal(){modal.classList.remove('show')}
+function studentForm(x={}){openModal(x.id?'Edit Student':'Add Student',`<form onsubmit="saveStudent(event)"><input type="hidden" id="sid" value="${x.id||''}"><label>Roll No</label><input id="sroll" value="${esc(x.roll||'')}"><label>Student Name</label><input id="sname" required value="${esc(x.name||'')}"><label>Father / Guardian</label><input id="sfather" value="${esc(x.father||'')}"><label>Admission No</label><input id="sadmission" value="${esc(x.admission_no||'')}"><label>Class / Section</label><select id="ssection">${S.sections.map(s=>`<option value="${s.id}" ${String(s.id)===String(x.section_id)?'selected':''}>${esc(s.class_name)} — ${esc(s.name)}</option>`).join('')}</select><button class="btn">Save Student</button></form>`)}
+async function saveStudent(e){e.preventDefault();await api('save_student',{method:'POST',body:JSON.stringify({id:sid.value,roll:sroll.value,name:sname.value,father:sfather.value,admission_no:sadmission.value,section_id:ssection.value})});closeModal();refresh()}
+async function delStudent(id){if(confirm('Mark this student inactive?')){await api('delete_student',{method:'POST',body:JSON.stringify({id})});refresh()}}
+function teacherForm(x={}){openModal(x.id?'Edit Teacher':'Add Teacher',`<form onsubmit="saveTeacher(event)"><input type="hidden" id="tid" value="${x.id||''}"><label>Name</label><input id="tname" required value="${esc(x.name||'')}"><label>Designation</label><input id="tdesignation" value="${esc(x.designation||'')}"><label>Qualification</label><input id="tqualification" value="${esc(x.qualification||'')}"><label>Phone</label><input id="tphone" value="${esc(x.phone||'')}"><label>Email</label><input id="temail" value="${esc(x.email||'')}"><button class="btn">Save Teacher</button></form>`)}
+async function saveTeacher(e){e.preventDefault();await api('save_teacher',{method:'POST',body:JSON.stringify({id:tid.value,name:tname.value,designation:tdesignation.value,qualification:tqualification.value,phone:tphone.value,email:temail.value})});closeModal();refresh()}
+async function delTeacher(id){if(confirm('Mark this staff member inactive?')){await api('delete_teacher',{method:'POST',body:JSON.stringify({id})});refresh()}}
+function classForm(x={}){openModal(x.id?'Edit Class':'Add Class',`<form onsubmit="saveClass(event)"><input type="hidden" id="cid" value="${x.id||''}"><label>Class Name</label><input id="cname" required value="${esc(x.name||'')}"><button class="btn">Save Class</button></form>`)}
+async function saveClass(e){e.preventDefault();await api('save_class',{method:'POST',body:JSON.stringify({id:cid.value,name:cname.value})});closeModal();refresh()}
+function sectionForm(x={}){openModal(x.id?'Edit Section':'Add Section',`<form onsubmit="saveSection(event)"><input type="hidden" id="secid" value="${x.id||''}"><label>Class</label><select id="secclass">${S.classes.map(c=>`<option value="${c.id}" ${String(c.id)===String(x.class_id)?'selected':''}>${esc(c.name)}</option>`).join('')}</select><label>Section Name</label><input id="secname" required value="${esc(x.name||'')}"><button class="btn">Save Section</button></form>`)}
+async function saveSection(e){e.preventDefault();await api('save_section',{method:'POST',body:JSON.stringify({id:secid.value,class_id:secclass.value,name:secname.value})});closeModal();refresh()}
+function examForm(x={}){openModal(x.id?'Edit Examination':'Add Examination',`<form onsubmit="saveExam(event)"><input type="hidden" id="eid" value="${x.id||''}"><label>Examination Name</label><input id="ename" required value="${esc(x.name||'')}"><label>Academic Year</label><input id="eyear" required value="${esc(x.academic_year||'2026-27')}"><label><input id="epub" type="checkbox" style="width:auto" ${x.is_published?'checked':''}> Published</label><label><input id="edemo" type="checkbox" style="width:auto" ${x.is_demo?'checked':''}> Demo data</label><br><button class="btn">Save Examination</button></form>`)}
+async function saveExam(e){e.preventDefault();await api('save_exam',{method:'POST',body:JSON.stringify({id:eid.value,name:ename.value,academic_year:eyear.value,is_published:epub.checked,is_demo:edemo.checked})});closeModal();refresh()}
+function fillMarkSelects(){markExam.innerHTML=S.exams.map(x=>`<option value="${x.id}">${esc(x.name)} — ${esc(x.academic_year)}</option>`).join('');markStudent.innerHTML=S.students.map(x=>`<option value="${x.id}">${esc(x.name)} — ${esc(x.roll||'')}</option>`).join('');if(!document.querySelector('#subjectRows .subject-row'))addSubjectRow()}
+function addSubjectRow(){const d=document.createElement('div');d.className='subject-row grid2';d.style.marginBottom='4px';d.innerHTML='<div><input class="sub-name" placeholder="Subject name" required></div><div style="display:flex;gap:6px"><input class="sub-total" type="number" min="0" placeholder="Total" required><input class="sub-obt" type="number" min="0" placeholder="Obtained" required><button type="button" class="btn danger small" onclick="this.closest(\'.subject-row\').remove()">×</button></div>';subjectRows.appendChild(d)}
+async function saveMarks(e){e.preventDefault();const rows=[...document.querySelectorAll('.subject-row')].map(r=>({name:r.querySelector('.sub-name').value,total:r.querySelector('.sub-total').value,obtained:r.querySelector('.sub-obt').value}));if(!rows.length)return alert('Add at least one subject.');await api('save_result',{method:'POST',body:JSON.stringify({student_id:markStudent.value,exam_id:markExam.value,subjects:rows})});alert('Result saved successfully.');}
+
+async function loadAdmissions(){
+  const table=document.getElementById('admissionsTable');
+  table.innerHTML='<tr><td>Loading applications...</td></tr>';
+
+  try{
+    const d=await api('admin_admissions');
+    S.admissions=d.rows||[];
+
+    table.innerHTML=
+      '<tr>'+
+      '<th>Application No.</th>'+
+      '<th>Student</th>'+
+      '<th>Father / Guardian</th>'+
+      '<th>Class</th>'+
+      '<th>Contact</th>'+
+      '<th>DOB</th>'+
+      '<th>Status</th>'+
+      '<th>Submitted</th>'+
+      '<th>Action</th>'+
+      '</tr>'+
+      S.admissions.map(x=>{
+        const status=esc(x.status||'Pending');
+        return '<tr>'+
+          '<td><b>'+esc(x.application_no)+'</b></td>'+
+          '<td>'+esc(x.student_name)+'</td>'+
+          '<td>'+esc(x.father_name)+'</td>'+
+          '<td>'+esc(x.class_name)+'</td>'+
+          '<td>'+esc(x.phone)+'</td>'+
+          '<td>'+esc(x.dob)+'</td>'+
+          '<td>'+status+'</td>'+
+          '<td>'+esc(x.created_at||'-')+'</td>'+
+          '<td>'+
+            '<select onchange="updateAdmissionStatus('+Number(x.id)+',this.value)">'+
+              '<option value="Pending" '+(x.status==='Pending'?'selected':'')+'>Pending</option>'+
+              '<option value="Approved" '+(x.status==='Approved'?'selected':'')+'>Approved</option>'+
+              '<option value="Rejected" '+(x.status==='Rejected'?'selected':'')+'>Rejected</option>'+
+            '</select>'+
+          '</td>'+
+        '</tr>';
+      }).join('');
+
+    if(!S.admissions.length){
+      table.innerHTML='<tr><td colspan="9">No admission applications have been submitted yet.</td></tr>';
+    }
+  }catch(e){
+    table.innerHTML='<tr><td colspan="9"><div class="notice">'+esc(e.message)+'</div></td></tr>';
+  }
+}
+
+async function updateAdmissionStatus(id,status){
+  try{
+    await api('update_admission_status',{
+      method:'POST',
+      body:JSON.stringify({id,status})
+    });
+    await loadAdmissions();
+  }catch(e){
+    alert(e.message);
+    await loadAdmissions();
+  }
+}
+
+async function printWholeSchoolResult(){try{const d=await api('whole_school_report');const w=window.open('','_blank');w.document.write('<html><head><title>Whole School Result</title><style>body{font-family:Arial;padding:25px}h1,h2{text-align:center}.table{width:100%;border-collapse:collapse}.table th,.table td{border:1px solid #888;padding:7px}.table th{background:#eee}@page{size:A4;margin:12mm}</style></head><body><h1>Govt. Muslim Girls A.V. High School Jhelum</h1><h2>Whole School Result</h2><table class="table"><tr><th>Roll No</th><th>Student Name</th><th>Class</th><th>Total Marks</th><th>Obtained Marks</th><th>Percentage</th></tr>'+d.rows.map(x=>`<tr><td>${esc(x.roll||'-')}</td><td>${esc(x.student_name)}</td><td>${esc(x.class_name)}</td><td>${x.total_marks}</td><td>${x.obtained_marks}</td><td>${x.percentage}%</td></tr>`).join('')+'</table><script>window.onload=()=>window.print()<\/script></body></html>');w.document.close()}catch(e){alert(e.message)}}boot();
+</script></body></html>
