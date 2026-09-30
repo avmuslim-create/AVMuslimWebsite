@@ -1,7 +1,7 @@
 <?php
 return [
- 'db_host'=>'localhost',
- 'db_name'=>'school_management',
- 'db_user'=>'school_user',
- 'db_pass'=>'CHANGE_THIS_PASSWORD',
+ 'db_host' => 'db.zcqlqepmjhgtahbkxbeo.supabase.co',
+  'db_name' => 'postgres',
+  'db_user' => 'postgres',
+  'db_pass' => 'postgresql://postgres:[YOUR-PASSWORD]@db.zcqlqepmjhgtahbkxbeo.supabase.co:5432/postgres',
 ];
