@@ -1,0 +1,35 @@
+AV MUSLIM WEBSITE - EXISTING SUPABASE TABLES
+
+Your existing tables are already compatible with the website. Do NOT run the old supabase-schema.sql.
+Use supabase-existing-schema.sql instead.
+
+1. In Supabase, go to SQL Editor and run supabase-existing-schema.sql.
+2. Go to Authentication -> Users -> Add user.
+   Create the admin email/password you want to use on admin.html.
+3. Copy the new user's UUID.
+4. In Table Editor -> admins, find the administrator row and put that UUID in auth_user_id.
+   Or run:
+
+   update public.admins
+   set auth_user_id = 'YOUR-AUTH-USER-UUID'
+   where username = 'YOUR-ADMIN-USERNAME';
+
+5. Get Supabase Project URL and Publishable key.
+6. Edit supabase-config.js:
+
+   window.SUPABASE_CONFIG = {
+     url: 'https://YOUR-PROJECT.supabase.co',
+     key: 'YOUR-PUBLISHABLE-KEY'
+   };
+
+7. Upload/push the whole folder to GitHub and deploy that repository in Netlify.
+8. Open /admin.html and log in using the Supabase Auth email/password.
+
+IMPORTANT:
+- Never put a Supabase secret/service-role key in this project.
+- The existing admins.password_hash is NOT used by browser login. Supabase Auth stores the password securely.
+- Do not delete your existing admins rows or other data.
+- The migration only adds admins.auth_user_id and RLS/indexes.
+
+Known database compatibility detail:
+The existing results table does not have a unique constraint on (student_id, exam_id), so the website now checks for an existing result and updates it instead of relying on PostgreSQL upsert.

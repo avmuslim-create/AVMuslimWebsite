@@ -1,35 +1,16 @@
-UPDATED SCHOOL WEBSITE
-========================
+AV MUSLIM SCHOOL — NETLIFY + SUPABASE
+=====================================
 
-Files:
-- index.html
-- admin.html
-- games.html
-- api.php
-- admissions_table.sql
+The website now uses Supabase instead of PHP/MySQL, so it can run directly on Netlify.
 
-1. Replace your old index.html, admin.html and games.html with these files.
-2. Replace your old api.php with the included api.php.
-3. Keep your existing config.php / config.local.php unchanged.
-4. In phpMyAdmin, run admissions_table.sql in the SAME database used by your config.php.
-5. Open the site through PHP hosting/XAMPP, not file://.
+1. Create a Supabase project.
+2. Open Supabase SQL Editor and run supabase-schema.sql.
+3. Create an administrator in Supabase Authentication -> Users.
+4. Add that user's UUID to public.profiles with role='admin'. See README-SUPABASE.md.
+5. Put the Supabase Project URL and Publishable key in supabase-config.js.
+6. Push the folder to GitHub and deploy it on Netlify with publish directory '.'.
 
-Online admission:
-Website -> Admissions -> Online Admission Form -> Submit
-The application is saved to the admissions table.
+Admin page: /admin.html
+Public website: /index.html
 
-Admin:
-Website -> Admin -> Login
-After login -> Admissions
-Admin can view applications and change status.
-
-Games:
-index.html -> Games -> games.html
-All existing game links in games.html are preserved.
-
-IMPORTANT:
-Your games.html refers to individual game files such as:
-chick.html, collect-fruits.html, dodge-ball.html, fly-game.html,
-gobo-jump.html, khadija-and-afia-animation.html, maze-game.html,
-snow-man.html and games/dodge-ball.html.
-Those files must also be uploaded to the same locations for the individual games to open.
+The old api.php/MySQL setup is no longer required.
