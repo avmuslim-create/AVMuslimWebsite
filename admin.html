@@ -23,7 +23,7 @@ async function login(e){
   }catch(x){loginMsgEl.innerHTML='<div class="notice">'+esc(x.message)+'</div>';}
 }
 async function boot(){try{const s=await api('session');if(s.logged_in)await showApp(s.admin.name);}catch(x){console.warn(x.message)}}
-async function showApp(name){login.classList.add('hidden');app.classList.remove('hidden');adminName.textContent='Logged in as '+name;await refresh()}
+async function showApp(name){document.getElementById('login').classList.add('hidden');document.getElementById('app').classList.remove('hidden');adminName.textContent='Logged in as '+name;await refresh()}
 async function logout(){await api('logout');location.reload()}
 function tab(id,b){document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.side button').forEach(x=>x.classList.remove('active'));b.classList.add('active');}
 async function refresh(){const [d,st,t,c,e]=await Promise.all([api('dashboard'),api('admin_students'),api('admin_teachers'),api('admin_classes'),api('admin_exams')]);stats.innerHTML=`<div class="stat"><b>${d.students}</b>Students</div><div class="stat"><b>${d.teachers}</b>Teachers/Staff</div><div class="stat"><b>${d.classes}</b>Classes</div><div class="stat"><b>${d.sections}</b>Sections</div>`;S.students=st.rows;S.teachers=t.rows;S.classes=c.classes;S.sections=c.sections;S.exams=e.rows;renderTables();fillMarkSelects()}
