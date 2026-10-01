@@ -11,7 +11,7 @@
 <table class="table" id="admissionsTable"></table>
 </div>
 </section><section id="marks" class="tab"><h2>Enter / Update Marks</h2><form onsubmit="saveMarks(event)"><div class="grid2"><div><label>Examination</label><select id="markExam" required></select></div><div><label>Student</label><select id="markStudent" required></select></div></div><p style="font-size:13px;color:#64748b">Add one row per subject. Total and percentage are calculated automatically.</p><div id="subjectRows"></div><button type="button" class="btn alt" onclick="addSubjectRow()">+ Add Subject</button><button class="btn" style="margin-left:8px">Save Result</button></form></section><section id="reports" class="tab"><h2>Reports & Printing</h2><div class="grid2"><div class="stat"><b>Individual</b><p>Open any student result and print the complete subject-wise result.</p></div><div class="stat"><b>Class Result</b><p>From the website's class/section student list, print roll number, student name and total marks only.</p></div><div class="stat"><b>Whole School</b><p>Print the complete school list with total marks, obtained marks and percentage only.</p><button class="btn" onclick="printWholeSchoolResult()">🖨 Print Whole School Result</button></div></div></section></main></div></div><div id="modal" class="modal"><div class="modalbox"><div class="top"><h2 id="modalTitle">Edit</h2><button class="btn alt" onclick="closeModal()">×</button></div><div id="modalBody"></div></div></div>
-let S={students:[],teachers:[],classes:[],sections:[],exams:[],admissions:[]};
+<script>let S={students:[],teachers:[],classes:[],sections:[],exams:[],admissions:[]};
 async function login(e){
   e.preventDefault();
   const email=document.getElementById('username').value.trim();
