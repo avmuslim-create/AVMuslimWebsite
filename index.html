@@ -622,6 +622,71 @@ footer ul{
   .admission-form-grid > div[style*="grid-column"]{grid-column:auto!important}
 }
 
+
+.achievement-gallery figure{
+    cursor:pointer;
+    transition:.2s;
+}
+.achievement-gallery figure:hover{
+    border-color:#4ade80;
+    box-shadow:0 10px 24px rgba(22,163,74,.13);
+}
+.achievement-gallery{
+    align-items:start;
+}
+.achievement-gallery img{
+    height:auto;
+    object-fit:contain;
+    background:white;
+}
+.photo-viewer{
+    display:none;
+    position:fixed;
+    inset:0;
+    z-index:7000;
+    background:rgba(8,24,14,.97);
+    align-items:center;
+    justify-content:center;
+    padding:30px 70px;
+}
+.photo-viewer.open{display:flex}
+.photo-viewer img{
+    max-width:100%;
+    max-height:88vh;
+    border-radius:12px;
+    background:white;
+}
+.pv-btn{
+    position:absolute;
+    border:0;
+    width:46px;
+    height:46px;
+    border-radius:50%;
+    background:rgba(255,255,255,.92);
+    color:#15803d;
+    font-size:22px;
+    font-weight:bold;
+    cursor:pointer;
+    line-height:1;
+}
+.pv-btn:hover{background:#dcfce7}
+.pv-prev{left:16px;top:50%;transform:translateY(-50%)}
+.pv-next{right:16px;top:50%;transform:translateY(-50%)}
+.pv-close{right:16px;top:16px}
+.pv-count{
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:18px;
+    text-align:center;
+    color:#d1fae5;
+    font-size:13px;
+}
+@media(max-width:650px){
+    .photo-viewer{padding:16px}
+    .pv-prev{left:6px}
+    .pv-next{right:6px}
+}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="./supabase-config.js"></script><script src="./supabase-api.js"></script></head>
 
@@ -1289,6 +1354,64 @@ Clear Form
 </div>
 </div>
 
+<!-- ACHIEVEMENT GALLERY MODAL -->
+
+<div class="modal" id="achievementModal" onclick="closeAchievementGallery(event)">
+<div class="gallery-modal-box" onclick="event.stopPropagation()">
+
+<div class="modal-head">
+<h2>🏆 2026 Achievement Gallery</h2>
+<button class="close" onclick="closeAchievementGallery()">×</button>
+</div>
+
+<div class="achievement-gallery">
+
+<figure onclick="openAchievementPhoto(0)">
+<img src="images/laptop-ceremony-1-thumb.jpg" alt="School achievement photograph 1" loading="lazy">
+</figure>
+<figure onclick="openAchievementPhoto(1)">
+<img src="images/laptop-ceremony-2-thumb.jpg" alt="School achievement photograph 2" loading="lazy">
+</figure>
+<figure onclick="openAchievementPhoto(2)">
+<img src="images/laptop-ceremony-3-thumb.jpg" alt="School achievement photograph 3" loading="lazy">
+</figure>
+<figure onclick="openAchievementPhoto(3)">
+<img src="images/laptop-ceremony-group-thumb.jpg" alt="School achievement photograph 4" loading="lazy">
+</figure>
+<figure onclick="openAchievementPhoto(4)">
+<img src="images/certificate-group-thumb.jpg" alt="School achievement photograph 5" loading="lazy">
+</figure>
+<figure onclick="openAchievementPhoto(5)">
+<img src="images/dc-office-thumb.jpg" alt="School achievement photograph 6" loading="lazy">
+</figure>
+<figure onclick="openAchievementPhoto(6)">
+<img src="images/ssc-certificate-thumb.jpg" alt="School achievement photograph 7" loading="lazy">
+</figure>
+<figure onclick="openAchievementPhoto(7)">
+<img src="images/position-holder-thumb.jpg" alt="School achievement photograph 8" loading="lazy">
+</figure>
+<figure onclick="openAchievementPhoto(8)">
+<img src="images/peace-seminar-thumb.jpg" alt="School achievement photograph 9" loading="lazy">
+</figure>
+</div>
+
+</div>
+</div>
+
+
+<div class="photo-viewer" id="photoViewer" onclick="closeAchievementPhotoFromBackdrop(event)">
+
+<button class="pv-btn pv-close" onclick="closeAchievementPhoto()" aria-label="Close">×</button>
+<button class="pv-btn pv-prev" onclick="stepAchievementPhoto(-1,event)" aria-label="Previous">‹</button>
+<button class="pv-btn pv-next" onclick="stepAchievementPhoto(1,event)" aria-label="Next">›</button>
+
+<img id="photoViewerImg" src="" alt="School achievement photograph">
+
+<div class="pv-count" id="photoViewerCount"></div>
+
+</div>
+
+
 <!-- ACADEMIC ACHIEVEMENT RESULT MODAL -->
 
 <div class="modal" id="academicResultModal" onclick="closeAcademicResult(event)">
@@ -1420,6 +1543,13 @@ function closeAdmissionForm(event){
 function openAcademicInfo(type){const modal=document.getElementById('academicInfoModal');const titles={course:'📚 Class-wise Course',timetable:'🕐 Sample Timetable',calendar:'📆 Academic Calendar 2026–27',timeline:'⭐ Important Timelines'};document.getElementById('academicInfoTitle').textContent=titles[type]||'📚 Academic Information';document.querySelectorAll('.academic-info-panel').forEach(p=>p.classList.remove('active'));const panel=document.getElementById('academicPanel'+type.charAt(0).toUpperCase()+type.slice(1));if(panel)panel.classList.add('active');modal.style.display='flex';document.body.style.overflow='hidden';}
 function closeAcademicInfo(event){const modal=document.getElementById('academicInfoModal');if(event&&event.target!==modal)return;modal.style.display='none';document.body.style.overflow='';}
 function openAchievementGallery(){document.getElementById('achievementModal').style.display='flex';document.body.style.overflow='hidden';}
+const achievementPhotos=["images/laptop-ceremony-1.jpg","images/laptop-ceremony-2.jpg","images/laptop-ceremony-3.jpg","images/laptop-ceremony-group.jpg","images/certificate-group.jpg","images/dc-office.jpg","images/ssc-certificate.jpg","images/position-holder.jpg","images/peace-seminar.jpg"];
+let achievementPhotoIndex=0;
+function openAchievementPhoto(i){achievementPhotoIndex=i;document.getElementById('photoViewerImg').src=achievementPhotos[i];document.getElementById('photoViewerCount').textContent=(i+1)+' / '+achievementPhotos.length;document.getElementById('photoViewer').classList.add('open');}
+function stepAchievementPhoto(step,e){if(e)e.stopPropagation();const n=achievementPhotos.length;openAchievementPhoto((achievementPhotoIndex+step+n)%n);}
+function closeAchievementPhoto(){document.getElementById('photoViewer').classList.remove('open');}
+function closeAchievementPhotoFromBackdrop(e){if(e.target.id==='photoViewer')closeAchievementPhoto();}
+document.addEventListener('keydown',e=>{const v=document.getElementById('photoViewer');if(!v||!v.classList.contains('open'))return;if(e.key==='Escape')closeAchievementPhoto();if(e.key==='ArrowRight')stepAchievementPhoto(1);if(e.key==='ArrowLeft')stepAchievementPhoto(-1);});
 function closeAchievementGallery(event){if(event&&event.target!==document.getElementById('achievementModal'))return;document.getElementById('achievementModal').style.display='none';document.body.style.overflow='';}
 function openAcademicResult(){document.getElementById('academicResultModal').style.display='flex';document.body.style.overflow='hidden';}
 function closeAcademicResult(event){if(event&&event.target!==document.getElementById('academicResultModal'))return;document.getElementById('academicResultModal').style.display='none';document.body.style.overflow='';}
@@ -1428,7 +1558,7 @@ async function loadContent(teacherRows=[]){
   const map={heroText:'heroText',admissionText:'admissionText',documentsText:'documentsText',admissionTimeline:'admissionTimeline',courseText:'courseText',timetableText:'timetableText',calendarText:'calendarText',timelineText:'timelineText',previousActivities:'previousActivities',activityPlanner:'activityPlanner',schoolText:'schoolText',staffText:'staffText',contactSchool:'contactSchool',contactInfo:'contactInfo',contactAddress:'contactAddress',footerContact:'footerContact'};
   Object.keys(map).forEach(k=>{if(c[k]!==undefined){const el=document.getElementById(map[k]);if(el)el.textContent=c[k];}});
   let stories=[]; try{stories=(await api('stories')).stories||[];}catch(e){}; if(!stories.length)stories=[{title:'Academic Achievement',text:'Our students continue to achieve success through hard work and dedication.'},{title:'Co-Curricular Success',text:'Students participate in competitions, activities and educational events.'}];
-  document.getElementById('successCards').innerHTML=`<div class="card achievement-card success-card" onclick="openAchievementGallery()"><div class="achievement-preview"><img src="https://scontent.fxjm3-1.fna.fbcdn.net/v/t39.30808-6/499600517_122137652354747513_1244924072820482490_n.jpg?stp=dst-jpg_tt6&cstp=mx1290x1290&ctp=s1290x1290&_nc_cat=110&_nc_map=urlgen_bucketless&ccb=1-7&_nc_sid=833d8c&_nc_ohc=uWt7sH9nTO8Q7kNvwEUuR-V&_nc_oc=Adp-wZy_ApjpuC4QPBVhk-ZAYrw1dXHmlIWSEHjp1zdRc46AcMPaUTp7cbog1On6POY&_nc_zt=23&_nc_ht=scontent.fxjm3-1.fna&_nc_gid=t8VH-ubzK3Cg01nsaRAvDw&_nc_ss=7b289&oh=00_AQJNTZ7UuJWr9SsFP5xlLQ-I1m3IxsUCj9uv1nSHH3Slaw&oe=6ABC63F8" alt="Certificate"><img src="https://scontent.fxjm3-1.fna.fbcdn.net/v/t39.30808-6/499928852_122137650704747513_1788453475976514779_n.jpg?stp=dst-jpg_tt6&cstp=mx1280x852&ctp=s1280x852&_nc_cat=111&_nc_map=urlgen_bucketless&ccb=1-7&_nc_sid=833d8c&_nc_ohc=NQvbjJtj7BwQ7kNvwHehMgc&_nc_oc=AdoGxFjyREXnbnP5lKMuKLaPHisorXfGZCF6dyllA-cPShCTfqgrwHB4M18HOeY8Bv8&_nc_zt=23&_nc_ht=scontent.fxjm3-1.fna&_nc_gid=F1b1ol-kiJyodajPnad2gw&_nc_ss=7b289&oh=00_AQKQXcLPq2N3j9LVLG7_IDYnYXK2IXscF-T3zFP9hpKHwQ&oe=6ABC46E9" alt="Ceremony"></div><div class="card-icon">🏆</div><h3>2026 Achievement Gallery</h3><p>Certificate, award and achievement ceremony photos.</p><span class="btn achievement-action">View Achievement Photos</span></div>${stories.map(s=>`<div class="card success-card"><div class="card-icon">🏆</div><h3>${safe(s.title)}</h3><p>${safe(s.text)}</p>${s.title==='Academic Achievement'?`<button class="btn achievement-action" onclick="openAcademicResult()">View Academic Achievement Results</button>`:''}</div>`).join('')}`;
+  document.getElementById('successCards').innerHTML=`<div class="card achievement-card success-card" onclick="openAchievementGallery()"><div class="achievement-preview"><img src="images/ssc-certificate-thumb.jpg" alt="Certificate"><img src="images/laptop-ceremony-1-thumb.jpg" alt="Ceremony"></div><div class="card-icon">🏆</div><h3>2026 Achievement Gallery</h3><p>Certificate, award and achievement ceremony photos.</p><span class="btn achievement-action">View Achievement Photos</span></div>${stories.map(s=>`<div class="card success-card"><div class="card-icon">🏆</div><h3>${safe(s.title)}</h3><p>${safe(s.text)}</p>${s.title==='Academic Achievement'?`<button class="btn achievement-action" onclick="openAcademicResult()">View Academic Achievement Results</button>`:''}</div>`).join('')}`;
   const staff=teacherRows||[];
    const seen=new Set();
    const uniqueStaff=staff.filter(s=>{
